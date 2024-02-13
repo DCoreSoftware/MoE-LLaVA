@@ -138,8 +138,15 @@ app = FastAPI()
 textbox = gr.Textbox(
     show_label=False, placeholder="Enter text and press ENTER", container=False
 )
-with gr.Blocks(title='MoE-LLaVA🚀', theme=gr.themes.Default(), css=block_css) as demo:
-    gr.Markdown(title_markdown)
+with gr.Blocks(title='Multimodal model', theme=gr.themes.Default(), css=block_css) as demo:
+    # gr.Markdown(title_markdown)
+    gr.Markdown("## Multimodal model")
+    gr.Markdown("This model is a multimodal conversational model that can understand and generate text based on images and text input.")
+    gr.Markdown("### Instructions")
+    gr.Markdown("""1. Upload an image and ask a question about it.<br/>
+    2. The model will generate a response based on the image and question.<br/>
+    3. You can also type a question directly in the chat window.<br/>
+    4. Click the 'Send' button to generate a response.""")
     state = gr.State()
     state_ = gr.State()
     first_run = gr.State()
@@ -152,24 +159,40 @@ with gr.Blocks(title='MoE-LLaVA🚀', theme=gr.themes.Default(), css=block_css) 
             cur_dir = os.path.dirname(os.path.abspath(__file__))
             gr.Examples(
                 examples=[
+                    # [
+                    #     f"{cur_dir}/examples/extreme_ironing.jpg",
+                    #     "What is unusual about this image?",
+                    # ],
+                    # [
+                    #     f"{cur_dir}/examples/waterview.jpg",
+                    #     "What are the things I should be cautious about when I visit here?",
+                    # ],
+                    # [
+                    #     f"{cur_dir}/examples/desert.jpg",
+                    #     "If there are factual errors in the questions, point it out; if not, proceed answering the question. What’s happening in the desert?",
+                    # ],
                     [
-                        f"{cur_dir}/examples/extreme_ironing.jpg",
-                        "What is unusual about this image?",
+                        f"{cur_dir}/examples/prejezd01.jpg",
+                        "What could you tell me about this image?",
                     ],
                     [
-                        f"{cur_dir}/examples/waterview.jpg",
-                        "What are the things I should be cautious about when I visit here?",
+                        f"{cur_dir}/examples/sunset.jpg",
+                        "How high was this image taken?",
                     ],
                     [
-                        f"{cur_dir}/examples/desert.jpg",
-                        "If there are factual errors in the questions, point it out; if not, proceed answering the question. What’s happening in the desert?",
+                        f"{cur_dir}/examples/skateboarding.jpg",
+                        "What is this girl looking for at the shop?",
                     ],
+                    [
+                        f"{cur_dir}/examples/parking.jpg",
+                        "Is the owner of the car good driver?",
+                    ]
                 ],
                 inputs=[image1, textbox],
             )
 
         with gr.Column(scale=7):
-            chatbot = gr.Chatbot(label="MoE-LLaVA", bubble_full_width=True).style(height=750)
+            chatbot = gr.Chatbot(label="Chat", bubble_full_width=True).style(height=550, width=500)
             with gr.Row():
                 with gr.Column(scale=8):
                     textbox.render()
@@ -177,28 +200,31 @@ with gr.Blocks(title='MoE-LLaVA🚀', theme=gr.themes.Default(), css=block_css) 
                     submit_btn = gr.Button(
                         value="Send", variant="primary", interactive=True
                     )
-            with gr.Row(elem_id="buttons") as button_row:
-                upvote_btn = gr.Button(value="👍  Upvote", interactive=True)
-                downvote_btn = gr.Button(value="👎  Downvote", interactive=True)
-                flag_btn = gr.Button(value="⚠️  Flag", interactive=True)
-                # stop_btn = gr.Button(value="⏹️  Stop Generation", interactive=False)
-                regenerate_btn = gr.Button(value="🔄  Regenerate", interactive=True)
+            # with gr.Row(elem_id="buttons") as button_row:
+            #     upvote_btn = gr.Button(value="👍  Upvote", interactive=True)
+            #     downvote_btn = gr.Button(value="👎  Downvote", interactive=True)
+            #     flag_btn = gr.Button(value="⚠️  Flag", interactive=True)
+            #     # stop_btn = gr.Button(value="⏹️  Stop Generation", interactive=False)
+            #     regenerate_btn = gr.Button(value="🔄  Regenerate", interactive=True)
                 clear_btn = gr.Button(value="🗑️  Clear history", interactive=True)
 
-    gr.Markdown(tos_markdown)
+    # gr.Markdown(tos_markdown)
     gr.Markdown(learn_more_markdown)
 
     submit_btn.click(generate, [image1, textbox, first_run, state, state_, images_tensor],
                      [state, state_, chatbot, first_run, textbox, images_tensor, image1])
 
-    regenerate_btn.click(regenerate, [state, state_], [state, state_, chatbot, first_run]).then(
-        generate, [image1, textbox, first_run, state, state_, images_tensor],
-        [state, state_, chatbot, first_run, textbox, images_tensor, image1])
+    textbox.submit(generate, [image1, textbox, first_run, state, state_, images_tensor],
+                     [state, state_, chatbot, first_run, textbox, images_tensor, image1])
+
+    # regenerate_btn.click(regenerate, [state, state_], [state, state_, chatbot, first_run]).then(
+    #     generate, [image1, textbox, first_run, state, state_, images_tensor],
+    #     [state, state_, chatbot, first_run, textbox, images_tensor, image1])
 
     clear_btn.click(clear_history, [state, state_],
                     [image1, textbox, first_run, state, state_, chatbot, images_tensor])
 
 # app = gr.mount_gradio_app(app, demo, path="/")
-demo.launch()
+demo.launch(server_name="0.0.0.0", server_port=9920, root_path="/multimodal")
 
 # uvicorn llava.serve.gradio_web_server:app

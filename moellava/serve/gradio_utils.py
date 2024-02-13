@@ -34,6 +34,7 @@ block_css = """
 #buttons button {
     min-width: min(120px,100%);
 }
+footer {visibility: hidden}
 """
 
 
