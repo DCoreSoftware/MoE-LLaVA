@@ -143,7 +143,7 @@ with gr.Blocks(title='Multimodal model', theme=gr.themes.Default(), css=block_cs
     gr.Markdown("## Multimodal model")
     gr.Markdown("This model is a multimodal conversational model that can understand and generate text based on images and text input.")
     gr.Markdown("### Instructions")
-    gr.Markdown("""1. Upload an image and ask a question about it.<br/>
+    gr.Markdown("""1. Upload an image and ask a question about it. Or use an example bellow.<br/>
     2. The model will generate a response based on the image and question.<br/>
     3. You can also type a question directly in the chat window.<br/>
     4. Click the 'Send' button to generate a response.""")
