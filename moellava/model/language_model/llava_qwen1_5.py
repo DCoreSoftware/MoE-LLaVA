@@ -18,8 +18,7 @@ from typing import List, Optional, Tuple, Union
 import torch
 import torch.nn as nn
 
-from transformers import AutoConfig, AutoModelForCausalLM, \
-                         MistralConfig, MistralModel, MistralForCausalLM
+from transformers import Qwen2Config, Qwen2Model, Qwen2ForCausalLM, AutoConfig, AutoModelForCausalLM
 
 from transformers.modeling_outputs import CausalLMOutputWithPast
 
@@ -27,24 +26,23 @@ from ..llava_arch import LlavaMetaModel, LlavaMetaForCausalLM
 import torch.distributed as dist
 
 
-class LlavaMistralConfig(MistralConfig):
-    model_type = "llava_mistral"
+class LlavaQwen1_5Config(Qwen2Config):
+    model_type = "llava_qwen1_5"
 
 
-class LlavaMistralModel(LlavaMetaModel, MistralModel):
-    config_class = LlavaMistralConfig
+class LlavaQwen1_5Model(LlavaMetaModel, Qwen2Model):
+    config_class = LlavaQwen1_5Config
 
-    def __init__(self, config: MistralConfig):
-        super(LlavaMistralModel, self).__init__(config)
+    def __init__(self, config: Qwen2Config):
+        super(LlavaQwen1_5Model, self).__init__(config)
 
 
-class LlavaMistralForCausalLM(MistralForCausalLM, LlavaMetaForCausalLM):
-    config_class = LlavaMistralConfig
+class LlavaQwen1_5ForCausalLM(Qwen2ForCausalLM, LlavaMetaForCausalLM):
+    config_class = LlavaQwen1_5Config
 
     def __init__(self, config):
-        super(MistralForCausalLM, self).__init__(config)
-        self.model = LlavaMistralModel(config)
-        # self.pretraining_tp = config.pretraining_tp
+        super(Qwen2ForCausalLM, self).__init__(config)
+        self.model = LlavaQwen1_5Model(config)
         self.vocab_size = config.vocab_size
         self.lm_head = nn.Linear(config.hidden_size, config.vocab_size, bias=False)
 
@@ -107,6 +105,7 @@ class LlavaMistralForCausalLM(MistralForCausalLM, LlavaMetaForCausalLM):
         # print(f'rank {dist.get_rank()}', 'after LLM')
         return out
 
+
     def prepare_inputs_for_generation(
             self, input_ids, past_key_values=None, attention_mask=None, inputs_embeds=None, **kwargs
     ):
@@ -129,6 +128,5 @@ class LlavaMistralForCausalLM(MistralForCausalLM, LlavaMetaForCausalLM):
         )
         return model_inputs
 
-
-AutoConfig.register("llava_mistral", LlavaMistralConfig)
-AutoModelForCausalLM.register(LlavaMistralConfig, LlavaMistralForCausalLM)
+AutoConfig.register("llava_qwen1_5", LlavaQwen1_5Config)
+AutoModelForCausalLM.register(LlavaQwen1_5Config, LlavaQwen1_5ForCausalLM)
