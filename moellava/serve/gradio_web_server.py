@@ -10,6 +10,11 @@ from PIL import Image
 import tempfile
 from decord import VideoReader, cpu
 from transformers import TextStreamer
+from huggingface_hub import login
+
+access_token_env = 'HF_TOKEN_READ'
+access_token_read = os.getenv(access_token_env)
+login(token = access_token_read)
 
 from moellava.conversation import conv_templates, SeparatorStyle, Conversation
 from moellava.serve.gradio_utils import Chat, tos_markdown, learn_more_markdown, title_markdown, block_css
@@ -99,7 +104,7 @@ def clear_history(state, state_):
             True, state, state_, state.to_gradio_chatbot(), [])
 
 parser = argparse.ArgumentParser()
-parser.add_argument("--model-path", type=str, default='LanguageBind/MoE-LLaVA-QWen-1.8B-4e2-1f')
+parser.add_argument("--model-path", type=str, default='LanguageBind/MoE-LLaVA-Qwen-1.8B-4e')
 parser.add_argument("--local_rank", type=int, default=-1)
 args = parser.parse_args()
 
