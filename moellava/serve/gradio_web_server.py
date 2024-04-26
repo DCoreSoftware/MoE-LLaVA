@@ -106,6 +106,7 @@ def clear_history(state, state_):
 parser = argparse.ArgumentParser()
 parser.add_argument("--model-path", type=str, default='LanguageBind/MoE-LLaVA-Qwen-1.8B-4e')
 parser.add_argument("--local_rank", type=int, default=-1)
+parser.add_argument("--root_path", type=str, default="/")
 args = parser.parse_args()
 
 # import os
@@ -197,7 +198,7 @@ with gr.Blocks(title='Multimodal model', theme=gr.themes.Default(), css=block_cs
             )
 
         with gr.Column(scale=7):
-            chatbot = gr.Chatbot(label="Chat", bubble_full_width=True).style(height=550, width=500)
+            chatbot = gr.Chatbot(label="Chat", bubble_full_width=True, min_width=400, height=500)
             with gr.Row():
                 with gr.Column(scale=8):
                     textbox.render()
@@ -229,7 +230,11 @@ with gr.Blocks(title='Multimodal model', theme=gr.themes.Default(), css=block_cs
     clear_btn.click(clear_history, [state, state_],
                     [image1, textbox, first_run, state, state_, chatbot, images_tensor])
 
+# os.environ.pop('http_proxy', None) #https://github.com/AUTOMATIC1111/stable-diffusion-webui/issues/15230
+# os.environ["no_proxy"] = "localhost,127.0.0.1,::1"
+
 # app = gr.mount_gradio_app(app, demo, path="/")
-demo.launch(server_name="0.0.0.0", server_port=9920, root_path="/multimodal")
+# demo.launch(debug=True, share=False, server_name='localhost', server_port=9920, root_path=args.root_path)
+demo.launch(server_name='0.0.0.0', ssl_verify=False, root_path=args.root_path)
 
 # uvicorn llava.serve.gradio_web_server:app
