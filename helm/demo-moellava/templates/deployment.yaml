@@ -61,7 +61,7 @@ spec:
           {{- end }}
           tty: true
           args:
-          - --server_root
+          - --root_path
           - {{ .Values.serverRoot | quote }}
       {{- with .Values.volumes }}
       volumes:
